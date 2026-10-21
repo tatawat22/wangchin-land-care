@@ -34,7 +34,7 @@ const iframe=document.createElement('iframe');iframe.title='Data service';
 iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none';
 window.addEventListener('message',e=>{
   let host='';try{host=new URL(e.origin).hostname}catch(_){return}
-  if(host!=='script.google.com' && !host.endsWith('.script.googleusercontent.com'))return;
+  if(host!=='script.google.com' && !host.endsWith('.script.googleusercontent.com') && !host.endsWith('-script.googleusercontent.com'))return;
   const m=e.data;
   if(!m || m.app!=='WANGCHIN_BRIDGE' || m.nonce!==bridgeNonce)return;
   // Learn the exact sender window and origin from a verified ready event.
