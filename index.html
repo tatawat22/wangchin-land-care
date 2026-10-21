@@ -3,16 +3,46 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wangchin Land Care</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #eef6f0;
+      padding: 30px 15px;
+      text-align: center;
+      color: #175b3b;
+    }
+    .card {
+      max-width: 440px;
+      margin: 30px auto;
+      padding: 25px;
+      background: white;
+      border-radius: 18px;
+    }
+  </style>
 </head>
-<body style="font-family:Tahoma,sans-serif;
-             text-align:center;padding:40px">
-  <h2>Smart Wangchin Land Care</h2>
-  <p>สำนักงานที่ดินจังหวัดแพร่ สาขาวังชิ้น</p>
-  <h3 style="color:green">
-    GitHub Pages พร้อมใช้งาน
-  </h3>
+<body>
+  <div class="card">
+    <h2>Smart Wangchin Land Care</h2>
+    <p>สำนักงานที่ดินจังหวัดแพร่ สาขาวังชิ้น</p>
+    <h3 id="status">กำลังตรวจสอบ LINE...</h3>
+  </div>
+
+  <script>
+    async function start() {
+      const status = document.getElementById('status');
+      try {
+        await liff.init({
+          liffId: '2012143285-670hRVgP'
+        });
+        status.textContent = 'LIFF เชื่อมต่อสำเร็จ';
+      } catch (e) {
+        status.textContent = 'เกิดข้อผิดพลาด: ' + e.message;
+      }
+    }
+    start();
+  </script>
 </body>
 </html>
