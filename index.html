@@ -27,28 +27,36 @@ const LIFF_ID='2012143285-670hRVgP';
 // Replace only the /exec URL below with the existing Apps Script Web app deployment URL.
 const GAS_URL='https://script.google.com/macros/s/AKfycbwn9EiCOBfOf-Ev1DM7FEyfSh8dEsL2_5o_RHWTLIMSeQ_72AFjM8BO4GlJnYFwAk6I/exec';
 let token='',list=[];
-const requestMap=new Map();let bridgeReady=false,seq=0;
+const requestMap=new Map();let bridgeReady=false,seq=0,bridgeSource=null,bridgeOrigin='';
+const nonceBytes=new Uint8Array(16);crypto.getRandomValues(nonceBytes);
+const bridgeNonce=Array.from(nonceBytes,x=>x.toString(16).padStart(2,'0')).join('');
 const iframe=document.createElement('iframe');iframe.title='Data service';
 iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none';
 window.addEventListener('message',e=>{
-  if(e.source!==iframe.contentWindow)return;
-  // The HTML Service iframe uses a randomized googleusercontent.com origin.
   let host='';try{host=new URL(e.origin).hostname}catch(_){return}
-  if(host!=='script.google.com'&&!host.endsWith('.script.googleusercontent.com'))return;
-  const m=e.data;if(!m||m.app!=='WANGCHIN_BRIDGE')return;
-  if(m.type==='ready'){bridgeReady=true;$('msg').textContent='เชื่อมต่อระบบข้อมูลสำเร็จ';if(token){$('registerButton').disabled=false;load()}return}
+  if(host!=='script.google.com' && !host.endsWith('.script.googleusercontent.com'))return;
+  const m=e.data;
+  if(!m || m.app!=='WANGCHIN_BRIDGE' || m.nonce!==bridgeNonce)return;
+  // Learn the exact sender window and origin from a verified ready event.
+  if(m.type==='ready'){
+    bridgeSource=e.source;bridgeOrigin=e.origin;bridgeReady=true;
+    $('msg').textContent='เชื่อมต่อระบบข้อมูลสำเร็จ';
+    if(token){$('registerButton').disabled=false;load()}return;
+  }
+  if(e.source!==bridgeSource || e.origin!==bridgeOrigin)return;
   if(m.type==='result'&&requestMap.has(m.id)){
     const task=requestMap.get(m.id);requestMap.delete(m.id);clearTimeout(task.timer);
-    if(m.ok){try{task.ok(m.data)}catch(err){showError(err)}}else showError(new Error(m.error||'ไม่สามารถทำรายการได้'));
+    if(m.ok){try{task.ok(m.data)}catch(error){showError(error)}}else showError(new Error(m.error||'ไม่สามารถทำรายการได้'));
   }
 });
 function showError(e){$('registerButton').disabled=false;$('msg').textContent='ข้อผิดพลาด: '+(e.message||String(e))}
 function connectBackend(){
  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(GAS_URL)){
-  throw new Error('กรุณาตั้งค่า GAS_URL ใน index.html ให้เป็น Apps Script URL ที่ลงท้าย /exec');
+  throw new Error('กรุณาตั้งค่า GAS_URL ให้ลงท้ายด้วย /exec');
  }
- iframe.src=GAS_URL+'?page=bridge';document.body.appendChild(iframe);
- setTimeout(()=>{if(!bridgeReady)$('msg').textContent='เชื่อมต่อ LINE ได้ แต่ยังติดต่อ Apps Script ไม่ได้: ตรวจการ Deploy และ URL';},20000);
+ iframe.src=GAS_URL+'?page=bridge&bridgeNonce='+bridgeNonce;
+ document.body.appendChild(iframe);
+ setTimeout(()=>{if(!bridgeReady)$('msg').textContent='เชื่อม LINE ได้ แต่ Bridge ไม่ตอบ: ตรวจการ Deploy/สิทธิ์ Web App หรือข้อจำกัด iframe ของเบราว์เซอร์';},20000);
 }
 
 const $=id=>document.getElementById(id);function n(tag,text){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e}function err(e){$('msg').textContent=e.message||String(e)}
@@ -56,7 +64,7 @@ function call(fn,args,ok){
  if(!bridgeReady){showError(new Error('ยังไม่เชื่อมต่อ Google Apps Script'));return}
  const id='req-'+(++seq);
  const timer=setTimeout(()=>{requestMap.delete(id);showError(new Error('รอการตอบกลับ Apps Script นานเกินไป'))},45000);
- requestMap.set(id,{ok,timer});iframe.contentWindow.postMessage({app:'WANGCHIN_BRIDGE',type:'call',id,method:fn,args},'*');
+ requestMap.set(id,{ok,timer});bridgeSource.postMessage({app:'WANGCHIN_BRIDGE',nonce:bridgeNonce,type:'call',id,method:fn,args},bridgeOrigin);
 }
 async function start(){
 
