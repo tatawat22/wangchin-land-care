@@ -1,48 +1,116 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script><style>
+*{box-sizing:border-box}body{font-family:Arial,Tahoma,sans-serif;background:#f0f6f2;margin:0;color:#1d4731}header{background:#116f46;color:white;padding:23px;text-align:center}main{max-width:650px;margin:auto;padding:14px}.card{background:white;border-radius:16px;padding:20px;margin:13px 0;box-shadow:0 4px 15px #0001}select{width:100%;padding:13px;border:1px solid #cad9ce;border-radius:9px;font-size:18px;margin:7px 0 14px;background:white}input{width:100%;padding:13px;border:1px solid #cad9ce;border-radius:9px;font-size:18px;margin:7px 0 14px}button{width:100%;background:#117b49;color:white;border:0;border-radius:9px;padding:14px;margin:6px 0;font-size:17px}label{display:block;margin-top:10px}.check{display:flex;gap:12px;align-items:center;padding:10px 0}.check input{width:23px;height:23px;margin:0}.hide{display:none}.muted{color:#536d5a}.notice{padding:12px;background:#e7f4eb;border-radius:10px;white-space:pre-line}</style></head><body><header><h2>Smart Wangchin Land Care</h2><div>บริการผ่าน LINE • สำนักงานที่ดินจังหวัดแพร่ สาขาวังชิ้น</div></header><main>
+<section class="card"><div id="msg">กำลังเชื่อมต่อ LINE...</div></section>
+<section class="card" id="register"><h3>ลงทะเบียนรับบริการพิเศษผ่าน LINE</h3>
+<p class="muted">ลงทะเบียนผ่าน LINE โดยตรง ไม่ต้องใช้ PIN ในครั้งนี้หรือครั้งถัดไป</p>
+<label>ชื่อผู้ขอ</label><input id="firstName" maxlength="100" autocomplete="given-name" required>
+<label>นามสกุลผู้ขอ</label><input id="lastName" maxlength="100" autocomplete="family-name" required>
+<label>เรื่องที่ติดต่อ</label><input id="job" maxlength="200" placeholder="เช่น ไถ่ถอนจำนอง">
+<label>ประเภทเอกสารสิทธิ์</label><select id="docType">
+<option>โฉนดที่ดิน</option><option>น.ส.3 ก.</option><option>น.ส.3</option><option>ส.ค.1</option><option>น.ส.ล.</option><option>ใบจอง</option><option>ไม่มีเอกสารสิทธิ์</option><option>อื่น ๆ</option></select>
+<label>เลขที่เอกสารสิทธิ์</label><input id="docNo" maxlength="80" placeholder="เลขที่เอกสารสิทธิ์">
+<label>วันที่ประสงค์เข้ารับบริการ (ต้องลงทะเบียนล่วงหน้าอย่างน้อย 1 วัน และยังไม่ใช่วันนัดยืนยัน)</label><input id="visitDate" type="date">
+<label>กลุ่มผู้ขอรับบริการ</label><select id="group">
+<option>ผู้สูงอายุ</option><option>คนพิการ</option><option>ผู้ต้องการความช่วยเหลือ</option></select>
+<label>ความช่วยเหลือที่ต้องการ</label><select id="care">
+<option>รถเข็น/ช่วยเดิน</option><option>ช่วยอ่านเอกสาร</option><option>ช่วยสื่อสาร</option><option>ช่วยตรวจเอกสาร</option><option>ขอเจ้าหน้าที่ช่วยประสานงาน</option></select>
+<label>เบอร์โทรศัพท์สำหรับติดต่อ</label><input id="phone" type="tel" inputmode="numeric" maxlength="12" placeholder="08xxxxxxxx">
+<label class="check"><input id="callback" type="checkbox"><span>ต้องการให้เจ้าหน้าที่ติดต่อกลับ</span></label>
+<button id="registerButton" onclick="registerLine()">ลงทะเบียนผ่าน LINE</button>
+<p class="muted">ข้อมูลผูกกับ LINE ของผู้ใช้งานที่ลงทะเบียน ผู้ใช้ LINE คนอื่นไม่สามารถเปิดดูรายการนี้ได้โดยอัตโนมัติ</p>
+</section>
+<section class="card hide" id="legacy"><h3>ผูกรายการเดิมกับ LINE</h3><p class="muted">สำหรับรายการที่เคยลงทะเบียนผ่านเว็บไซต์ก่อนใช้ LINE เท่านั้น ใช้เบอร์และ PIN เดิมเพียงครั้งเดียว</p>
+<label>เบอร์โทรศัพท์</label><input id="phoneOld" type="tel"><label>PIN เดิม</label><input id="pinOld" type="password" maxlength="6"><button onclick="bindAccount()">ผูกรายการเดิม</button></section>
 
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wangchin Land Care</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>
-    body {
-      font-family: Tahoma, sans-serif;
-      background: #eef6f0;
-      padding: 30px 15px;
-      text-align: center;
-      color: #175b3b;
-    }
-    .card {
-      max-width: 440px;
-      margin: 30px auto;
-      padding: 25px;
-      background: white;
-      border-radius: 18px;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h2>Smart Wangchin Land Care</h2>
-    <p>สำนักงานที่ดินจังหวัดแพร่ สาขาวังชิ้น</p>
-    <h3 id="status">กำลังตรวจสอบ LINE...</h3>
-  </div>
+<section id="cases"></section><div style="text-align:center;padding:10px"><button style="background:#577563" onclick="document.getElementById('legacy').classList.toggle('hide')">มีรายการเก่าต้องการผูกกับ LINE</button></div></main><script>
+const LIFF_ID='2012143285-670hRVgP';
+// Replace only the /exec URL below with the existing Apps Script Web app deployment URL.
+const GAS_URL='https://script.google.com/macros/s/AKfycbwn9EiCOBfOf-Ev1DM7FEyfSh8dEsL2_5o_RHWTLIMSeQ_72AFjM8BO4GlJnYFwAk6I/exec';
+let token='',list=[];
+const requestMap=new Map();let bridgeReady=false,seq=0;
+const iframe=document.createElement('iframe');iframe.title='Data service';
+iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none';
+window.addEventListener('message',e=>{
+  if(e.source!==iframe.contentWindow)return;
+  // The HTML Service iframe uses a randomized googleusercontent.com origin.
+  let host='';try{host=new URL(e.origin).hostname}catch(_){return}
+  if(host!=='script.google.com'&&!host.endsWith('.script.googleusercontent.com'))return;
+  const m=e.data;if(!m||m.app!=='WANGCHIN_BRIDGE')return;
+  if(m.type==='ready'){bridgeReady=true;$('msg').textContent='เชื่อมต่อระบบข้อมูลสำเร็จ';if(token){$('registerButton').disabled=false;load()}return}
+  if(m.type==='result'&&requestMap.has(m.id)){
+    const task=requestMap.get(m.id);requestMap.delete(m.id);clearTimeout(task.timer);
+    if(m.ok){try{task.ok(m.data)}catch(err){showError(err)}}else showError(new Error(m.error||'ไม่สามารถทำรายการได้'));
+  }
+});
+function showError(e){$('registerButton').disabled=false;$('msg').textContent='ข้อผิดพลาด: '+(e.message||String(e))}
+function connectBackend(){
+ if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(GAS_URL)){
+  throw new Error('กรุณาตั้งค่า GAS_URL ใน index.html ให้เป็น Apps Script URL ที่ลงท้าย /exec');
+ }
+ iframe.src=GAS_URL+'?page=bridge';document.body.appendChild(iframe);
+ setTimeout(()=>{if(!bridgeReady)$('msg').textContent='เชื่อมต่อ LINE ได้ แต่ยังติดต่อ Apps Script ไม่ได้: ตรวจการ Deploy และ URL';},20000);
+}
 
-  <script>
-    async function start() {
-      const status = document.getElementById('status');
-      try {
-        await liff.init({
-          liffId: '2012143285-670hRVgP'
-        });
-        status.textContent = 'LIFF เชื่อมต่อสำเร็จ';
-      } catch (e) {
-        status.textContent = 'เกิดข้อผิดพลาด: ' + e.message;
-      }
-    }
-    start();
-  </script>
-</body>
-</html>
+const $=id=>document.getElementById(id);function n(tag,text){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e}function err(e){$('msg').textContent=e.message||String(e)}
+function call(fn,args,ok){
+ if(!bridgeReady){showError(new Error('ยังไม่เชื่อมต่อ Google Apps Script'));return}
+ const id='req-'+(++seq);
+ const timer=setTimeout(()=>{requestMap.delete(id);showError(new Error('รอการตอบกลับ Apps Script นานเกินไป'))},45000);
+ requestMap.set(id,{ok,timer});iframe.contentWindow.postMessage({app:'WANGCHIN_BRIDGE',type:'call',id,method:fn,args},'*');
+}
+async function start(){
+
+ if(!LIFF_ID){$('msg').textContent='ยังไม่ได้กำหนด LIFF ID';return}
+ try{await liff.init({liffId:LIFF_ID});if(!liff.isLoggedIn()){liff.login();return}
+ token=liff.getIDToken();if(!token)throw new Error('กรุณาอนุญาต openid scope ใน LIFF');$('msg').textContent='เชื่อมต่อ LINE สำเร็จ กำลังเชื่อมระบบข้อมูล...';connectBackend();
+ }catch(e){err(e)}
+}
+function load(){call('lineMyCases',[token],items=>{
+ list=items;$('msg').textContent=items.length?'รายการบริการของท่าน':'ยังไม่มีรายการที่ผูกกับบัญชี LINE นี้';draw();
+})}
+function bindAccount(){call('linkLineAccount',[token,$('phoneOld').value,$('pinOld').value],()=>{$('pinOld').value='';load()})}
+function registerLine(){
+ const d={firstName:$('firstName').value,lastName:$('lastName').value,job:$('job').value,docType:$('docType').value,docNo:$('docNo').value,
+ visitDate:$('visitDate').value,group:$('group').value,care:$('care').value,
+ phone:$('phone').value,callback:$('callback').checked};
+ if(!$('firstName').value.trim()||!$('lastName').value.trim()){alert('กรุณากรอกชื่อและนามสกุล');return}
+ if($('visitDate').value<$('visitDate').min){alert('ต้องลงทะเบียนล่วงหน้าอย่างน้อย 1 วัน');return}
+ const b=$('registerButton');if(!token||!bridgeReady){alert('ระบบยังเชื่อมต่อไม่สมบูรณ์');return}b.disabled=true;
+ call('lineRegister',[token,d],r=>{b.disabled=false;alert('ลงทะเบียนสำเร็จ '+r.id);load()});
+}
+
+const appointmentLabels={
+ APPT_PENDING:'⏳ รอเจ้าหน้าที่ยืนยันวันรับความช่วยเหลือ',
+ APPT_CONFIRMED:'✅ ยืนยันวันรับความช่วยเหลือแล้ว',
+ APPT_CHANGE_REQUESTED:'📅 เจ้าหน้าที่ขอเปลี่ยนวัน'
+};
+const status={PENDING:'รอตรวจสอบ',NEED_INFO:'ขอข้อมูลเพิ่ม',APPROVED:'พร้อมรับความช่วยเหลือ',TRAVELING:'กำลังเดินทาง',ARRIVED:'มาถึงสำนักงานแล้ว',ASSISTING:'กำลังช่วยเหลือ',COMPLETED:'เสร็จสิ้น'};
+function draw(){const area=$('cases');area.replaceChildren();list.forEach(r=>{
+ const card=n('section');card.className='card';card.append(n('h3',r.job));card.append(n('p','ผู้ขอ: '+[r.firstName,r.lastName].filter(Boolean).join(' ')));card.append(n('p','สถานะ: '+(status[r.status]||r.status)));
+ card.append(n('p','เอกสารสิทธิ์: '+r.docType+' '+r.docNo));card.append(n('p','วันที่ประสงค์มา: '+r.visitDate));
+ const appt=n('div');appt.className='notice';appt.style.margin='12px 0';
+ appt.append(n('strong',appointmentLabels[r.appointmentStatus]||appointmentLabels.APPT_PENDING));
+ if(r.appointmentStatus==='APPT_CONFIRMED'&&r.appointmentDate)
+  appt.append(n('p','วันที่ยืนยันให้เข้ารับความช่วยเหลือ: '+r.appointmentDate));
+ if(r.appointmentStatus==='APPT_CHANGE_REQUESTED')
+  appt.append(n('p','กรุณาติดต่อสำนักงานเพื่อประสานวันใหม่ก่อนเดินทาง'));
+ if(r.appointmentNote)appt.append(n('p','ข้อความจากเจ้าหน้าที่: '+r.appointmentNote));
+ appt.append(n('small','การยืนยันนี้เป็นการจัดเตรียมความช่วยเหลือ ไม่ใช่การยืนยันคิวทางทะเบียนกรมที่ดิน'));
+ card.append(appt);
+
+ if(r.docNote)card.append(n('p','หมายเหตุ: '+r.docNote));
+ const checked=[];r.requested.forEach(doc=>{
+  const l=n('label');l.className='check';const cb=n('input');cb.type='checkbox';cb.value=doc;cb.checked=r.checked.includes(doc);const t=n('span',doc);l.append(cb,t);card.append(l);checked.push(cb);
+ });
+ if(r.requested.length){const save=n('button','บันทึก Checklist');save.onclick=()=>call('lineSaveChecklist',[token,r.id,checked.filter(x=>x.checked).map(x=>x.value)],()=>load());card.append(save)}
+ if(r.status==='APPROVED'||r.status==='TRAVELING'){
+  const action=r.status==='APPROVED'?'DEPART':'ARRIVE';const b=n('button',action==='DEPART'?'🚗 ออกเดินทางแล้ว':'📍 มาถึงสำนักงานแล้ว');b.onclick=()=>call('lineJourney',[token,r.id,action],()=>load());card.append(b);
+ }
+ area.append(card)
+})}
+const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+const minDay=[tomorrow.getFullYear(),String(tomorrow.getMonth()+1).padStart(2,'0'),String(tomorrow.getDate()).padStart(2,'0')].join('-');
+$('visitDate').min=minDay;$('visitDate').value=minDay;
+$('registerButton').disabled=true;
+start();
+</script></body></html>
