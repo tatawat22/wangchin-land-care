@@ -40,13 +40,18 @@ window.addEventListener('message',e=>{
   // Learn the exact sender window and origin from a verified ready event.
   if(m.type==='ready'){
     bridgeSource=e.source;bridgeOrigin=e.origin;bridgeReady=true;
+    console.info('Bridge ready accepted', {origin:e.origin});
     $('msg').textContent='เชื่อมต่อระบบข้อมูลสำเร็จ';
     if(token){$('registerButton').disabled=false;load()}return;
   }
-  if(e.source!==bridgeSource || e.origin!==bridgeOrigin)return;
+  // Google HTML Service nests iframes, so source differs from the visible wrapper.
+  // The verified nonce and restricted Google-host origin are used for correlation.
+  if(e.origin!==bridgeOrigin)return;
+  if(m.type==='result'&&!requestMap.has(m.id)){ console.info('Bridge result without pending request', {id:m.id});return; }
   if(m.type==='result'&&requestMap.has(m.id)){
     const task=requestMap.get(m.id);requestMap.delete(m.id);clearTimeout(task.timer);
     if(m.ok){try{task.ok(m.data)}catch(error){showError(error)}}else showError(new Error(m.error||'ไม่สามารถทำรายการได้'));
+    console.info('Bridge response processed:', {id:m.id, ok:!!m.ok});
   }
 });
 function showError(e){$('registerButton').disabled=false;$('msg').textContent='ข้อผิดพลาด: '+(e.message||String(e))}
