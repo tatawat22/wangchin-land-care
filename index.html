@@ -13,7 +13,8 @@
 <label>กลุ่มผู้ขอรับบริการ</label><select id="group">
 <option>ผู้สูงอายุ</option><option>คนพิการ</option><option>ผู้ต้องการความช่วยเหลือ</option></select>
 <label>ความช่วยเหลือที่ต้องการ</label><select id="care">
-<option>รถเข็น/ช่วยเดิน</option><option>ช่วยอ่านเอกสาร</option><option>ช่วยตรวจเอกสาร</option><option>ขอเจ้าหน้าที่ช่วยประสานงาน</option></select>
+<option>รถเข็น/ช่วยเดิน</option><option>ช่วยอ่านเอกสาร</option><option>ช่วยตรวจเอกสาร</option><option>ขอเจ้าหน้าที่ช่วยประสานงาน</option><option>บริการถึงรถ</option></select>
+<div id="vehiclePlateWrap" class="hide"><label>เลขทะเบียนรถ (สำหรับบริการถึงรถ) *</label><input id="vehiclePlate" maxlength="30" placeholder="เช่น กข 1234 แพร่" autocomplete="off"></div>
 <label>เบอร์โทรศัพท์สำหรับติดต่อ</label><input id="phone" type="tel" inputmode="numeric" maxlength="12" placeholder="08xxxxxxxx">
 <label class="check"><input id="callback" type="checkbox"><span>ต้องการให้เจ้าหน้าที่ติดต่อกลับ</span></label>
 <button id="registerButton" onclick="registerLine()">ลงทะเบียนผ่าน LINE</button>
@@ -82,12 +83,15 @@ function load(){call('lineMyCases',[token],items=>{
  list=items;$('msg').textContent=items.length?'รายการบริการของท่าน':'ยังไม่มีรายการที่ผูกกับบัญชี LINE นี้';draw();
 })}
 function bindAccount(){call('linkLineAccount',[token,$('phoneOld').value,$('pinOld').value],()=>{$('pinOld').value='';load()})}
+function toggleVehiclePlate(){const show=$('care').value==='บริการถึงรถ';$('vehiclePlateWrap').classList.toggle('hide',!show);$('vehiclePlate').required=show;if(!show)$('vehiclePlate').value='';}
+$('care').addEventListener('change',toggleVehiclePlate);toggleVehiclePlate();
 function registerLine(){
  const d={firstName:$('firstName').value,lastName:$('lastName').value,job:$('job').value,docType:$('docType').value,docNo:$('docNo').value,
- visitDate:$('visitDate').value,group:$('group').value,care:$('care').value,
+ visitDate:$('visitDate').value,group:$('group').value,care:$('care').value,vehiclePlate:$('vehiclePlate').value,
  phone:$('phone').value,callback:$('callback').checked};
  if(!$('firstName').value.trim()||!$('lastName').value.trim()){alert('กรุณากรอกชื่อและนามสกุล');return}
  if($('visitDate').value<$('visitDate').min){alert('ต้องลงทะเบียนล่วงหน้าอย่างน้อย 1 วัน');return}
+ if($('care').value==='บริการถึงรถ'&&!$('vehiclePlate').value.trim()){alert('กรุณาระบุเลขทะเบียนรถ');return}
  const b=$('registerButton');if(!token||!bridgeReady){alert('ระบบยังเชื่อมต่อไม่สมบูรณ์');return}b.disabled=true;
  call('lineRegister',[token,d],r=>{b.disabled=false;alert('ลงทะเบียนสำเร็จ '+r.id);load()});
 }
