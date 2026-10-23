@@ -13,7 +13,7 @@
 <label>กลุ่มผู้ขอรับบริการ</label><select id="group">
 <option>ผู้สูงอายุ</option><option>คนพิการ</option><option>ผู้ต้องการความช่วยเหลือ</option></select>
 <label>ความช่วยเหลือที่ต้องการ</label><select id="care">
-<option>รถเข็น/ช่วยเดิน</option><option>ช่วยอ่านเอกสาร</option><option>ช่วยสื่อสาร</option><option>ช่วยตรวจเอกสาร</option><option>ขอเจ้าหน้าที่ช่วยประสานงาน</option></select>
+<option>รถเข็น/ช่วยเดิน</option><option>ช่วยอ่านเอกสาร</option><option>ช่วยตรวจเอกสาร</option><option>ขอเจ้าหน้าที่ช่วยประสานงาน</option></select>
 <label>เบอร์โทรศัพท์สำหรับติดต่อ</label><input id="phone" type="tel" inputmode="numeric" maxlength="12" placeholder="08xxxxxxxx">
 <label class="check"><input id="callback" type="checkbox"><span>ต้องการให้เจ้าหน้าที่ติดต่อกลับ</span></label>
 <button id="registerButton" onclick="registerLine()">ลงทะเบียนผ่าน LINE</button>
@@ -113,9 +113,9 @@ function draw(){const area=$('cases');area.replaceChildren();list.forEach(r=>{
 
  if(r.docNote)card.append(n('p','หมายเหตุ: '+r.docNote));
  const checked=[];r.requested.forEach(doc=>{
-  const l=n('label');l.className='check';const cb=n('input');cb.type='checkbox';cb.value=doc;cb.checked=r.checked.includes(doc);const t=n('span',doc);l.append(cb,t);card.append(l);checked.push(cb);
+  const l=n('label');l.className='check';const cb=n('input');cb.type='checkbox';cb.value=doc;cb.checked=r.checked.includes(doc);cb.disabled=cb.checked;const t=n('span',doc);l.append(cb,t);card.append(l);checked.push(cb);
  });
- if(r.requested.length){const save=n('button','บันทึก Checklist');save.onclick=()=>call('lineSaveChecklist',[token,r.id,checked.filter(x=>x.checked).map(x=>x.value)],()=>load());card.append(save)}
+ if(r.requested.length){if(r.requested.every(x=>r.checked.includes(x))){card.append(n('p','✅ ท่านได้ตรวจสอบเอกสารตาม Checklist ครบแล้ว ไม่ต้องตรวจซ้ำ'));}else{const save=n('button','บันทึก Checklist');save.onclick=()=>call('lineSaveChecklist',[token,r.id,checked.filter(x=>x.checked).map(x=>x.value)],()=>load());card.append(save)}}
  if(r.status==='APPROVED'||r.status==='TRAVELING'){
   const action=r.status==='APPROVED'?'DEPART':'ARRIVE';const b=n('button',action==='DEPART'?'🚗 ออกเดินทางแล้ว':'📍 มาถึงสำนักงานแล้ว');b.onclick=()=>call('lineJourney',[token,r.id,action],()=>load());card.append(b);
  }
